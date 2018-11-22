@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 17.1
 
@@ -44,8 +44,41 @@
 '''
 
 import glob
+import re
+import csv
 
 sh_version_files = glob.glob('sh_vers*')
 #print(sh_version_files)
 
 headers = ['hostname', 'ios', 'image', 'uptime']
+
+regex = ('IOS Software.+Version (?P<ios>\S+),'
+		'|image file is "(?P<image>\S+)"'
+		'|uptime is (?P<uptime>\d+ \w+(?:, \d+ \w+){2})')
+data_list = []
+
+def parse_sh_version (sh_version):
+	rlist = [None, None, None, None]
+	rlist[0] = sh_version.split('.')[0].split('_')[-1]
+	with open(sh_version) as f:
+		for line in f:
+			match = re.search(regex, line)
+			if match:
+				if match.lastgroup == 'ios':
+					rlist[1] = match.group('ios')
+				elif match.lastgroup == 'image':
+					rlist[2] = match.group('image')
+				elif match.lastgroup == 'uptime':
+					rlist[3] = match.group('uptime')
+	return rlist
+
+def write_to_csv (data, csv_out = 'routers_inventory.csv'):
+	with open(csv_out, 'w') as f:
+		writer = csv.writer(f, quoting=csv.QUOTE_NONNUMERIC)
+		writer.writerows(data)
+
+for sh_version in sh_version_files:
+	data_list.append(parse_sh_version(sh_version))
+
+data_list = sorted(data_list)
+write_to_csv(data_list)

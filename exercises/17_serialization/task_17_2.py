@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 17.2
 
@@ -24,3 +24,15 @@ R6           Fa 0/2          143           R S I           2811       Fa 0/0
 
 Проверить работу функции на содержимом файла sh_cdp_n_sw1.txt
 '''
+import re
+
+regex = '([A-Z0-9]+)\s+(\w+ [0-9/]+).+\s+(\w+ [0-9/]+)'
+def parse_sh_cdp_neighbors (str_text):
+	key = str_text.split('>')[0].strip()
+	matches = re.findall(regex, str_text)
+	idict = {intf: {dev : port} for  dev, intf, port in matches}
+	return {key : idict}
+
+if __name__ == '__main__':
+	with open('sh_cdp_n_sw1.txt') as f:
+		print(parse_sh_cdp_neighbors(f.read()))

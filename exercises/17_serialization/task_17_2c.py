@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 17.2c
 
@@ -29,3 +29,18 @@
 > pip install graphviz
 
 '''
+from draw_network_graph import draw_topology
+from task_17_2b import topology_dict
+
+topology = {}
+for key, value in topology_dict.items():
+	for key1, value1 in value.items():
+		for key2, value2 in value1.items():
+			topology.update({(key, key1):(key2, value2)})
+
+for value in list(topology.values()):
+	if topology[value] in topology.keys():
+		del(topology[value])
+
+print(topology)
+draw_topology(topology)

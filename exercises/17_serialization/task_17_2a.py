@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 17.2a
 
@@ -25,3 +25,20 @@
 
 Не копировать код функции parse_sh_cdp_neighbors
 '''
+import glob
+import yaml
+from pprint import pprint
+from task_17_2 import regex, parse_sh_cdp_neighbors
+
+sh_cdp_files = glob.glob('sh_cdp_n_*')
+
+topology = {}
+
+for sh_cdp in sh_cdp_files:
+	with open(sh_cdp) as f:
+		topology.update(parse_sh_cdp_neighbors(f.read()))
+if __name__ == '__main__':
+	pprint(topology)
+
+with open('topology.yaml', 'w') as f:
+	yaml.dump(topology, f)

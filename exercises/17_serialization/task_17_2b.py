@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 17.2b
 
@@ -29,3 +29,19 @@
 
 Не копировать код функции parse_sh_cdp_neighbors
 '''
+from task_17_2 import parse_sh_cdp_neighbors, regex
+from task_17_2a import sh_cdp_files
+import yaml
+
+def generate_topology_from_cdp (list_of_files, save_to_file = True,
+									topology_filename = 'topology.yaml'):
+	topology_dict = {}
+	for file_cdp in list_of_files:
+		with open(file_cdp) as f:
+			topology_dict.update(parse_sh_cdp_neighbors(f.read()))
+	if save_to_file:
+		with open(topology_filename, 'w') as f:
+			yaml.dump(topology_dict, f)
+	return topology_dict
+
+topology_dict = generate_topology_from_cdp(sh_cdp_files)
