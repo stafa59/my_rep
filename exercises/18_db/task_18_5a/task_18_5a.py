@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 18.5a
 
@@ -15,12 +15,16 @@
 
 '''
 
-from datetime import timedelta, datetime
+from add_data import insert_dhcp, insert_switches, delete
+import sqlite3
 
-now = datetime.today().replace(microsecond=0)
-week_ago = now - timedelta(days=7)
+db_filename = 'db1.db'
+shema_filename = 'dhcp_snooping_schema.sql'
 
-#print(now)
-#print(week_ago)
-#print(now > week_ago)
-#print(str(now) > str(week_ago))
+conn = sqlite3.connect(db_filename)
+insert_dhcp(conn)
+#insert_switches(conn)
+delete(conn)
+
+for tuples in conn.execute('select * from dhcp'):
+	print('{:20}{:18}{:5}{:18}{:3} {:3}   {:15}'.format(*tuples))

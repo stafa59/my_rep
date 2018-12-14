@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 18.5
 
@@ -27,7 +27,21 @@
 
 '''
 
-import datetime
+#import datetime
 
-now = str(datetime.datetime.today().replace(microsecond=0))
-#print(now)
+#now = str(datetime.datetime.today().replace(microsecond=0))
+##print(now)
+
+from create_db import create
+from add_data import insert_dhcp, insert_switches
+import sqlite3
+
+db_filename = 'db1.db'
+shema_filename = 'dhcp_snooping_schema.sql'
+
+conn = create(db_filename, shema_filename)
+insert_dhcp(conn)
+insert_switches(conn)
+
+for tuples in conn.execute('select * from dhcp'):
+	print('{:20}{:18}{:5}{:18}{:3} {:3}   {:15}'.format(*tuples))

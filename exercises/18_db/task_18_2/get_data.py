@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 На основе файла get_data_ver1.py из раздела, создать скрипт get_data.py.
 
@@ -67,3 +67,42 @@ switch      : sw2
 $ python get_data.py vlan
 Пожалуйста, введите два или ноль аргументов
 '''
+
+import sqlite3
+import sys
+
+db_filename = 'db.db'
+keys = ['mac', 'ip', 'vlan', 'interface', 'switch']
+if len(sys.argv[1:]) == 2:
+	key, value = sys.argv[1:]
+	keys.remove(key)
+conn = sqlite3.connect(db_filename)
+
+def db_find(conn = conn, n = len(sys.argv[1:])):
+	'''поиск по БД'''
+	if n == 0:
+		query = 'select * from dhcp'
+		result = conn.execute(query)
+		return result
+	elif n == 2:
+		#Позволяет далее обращаться к данным в колонках, по имени колонки
+		conn.row_factory = sqlite3.Row
+		query = 'select * from dhcp where {} = ?'.format(key)
+		result = conn.execute(query, (value, ))
+		return result
+
+
+def output (result, n = len(sys.argv[1:])):
+	if result:
+		for row in result:
+			if n == 2:
+				for k in keys:
+					print('{:12}: {}'.format(k, row[k]))
+				print('-' * 40)
+			elif n == 0:
+				print('{:20}{:20}{:12}{:20}{:12}'.format(*row))
+	else:
+		print('неверное число аргументов')
+
+print('-' * 40)
+output(db_find())

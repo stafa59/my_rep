@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 18.3
 
@@ -48,3 +48,23 @@
 И после этого проверить, что удаленные строки отображаются в таблице как неактивные.
 
 '''
+
+import add_data
+from create_db import create
+import sqlite3
+db_file = 'db_new.db'
+shema_file = 'dhcp_snooping_schema.sql'
+
+
+conn = create(db_file, shema_file)
+
+add_data.insert_dhcp(conn)
+add_data.insert_switches(conn)
+
+for row in conn.execute('SELECT * from dhcp'):
+	print(row)
+
+for row in conn.execute('SELECT * from switches'):
+	print(row)
+
+conn.close()

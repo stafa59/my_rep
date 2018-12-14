@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 18.4
 
@@ -46,3 +46,64 @@ Inactive values:
 00:A9:BB:3D:D6:58  10.1.10.20        10    FastEthernet0/7    sw2         0
 
 '''
+
+import sqlite3
+import sys
+from operator import itemgetter
+
+db_filename = 'db.db'
+keys = ['mac', 'ip', 'vlan', 'interface', 'switch', 'active']
+conn = sqlite3.connect(db_filename)
+
+def db_find(conn = conn, n = len(sys.argv[1:])):
+	'''поиск по БД'''
+	if n == 0:
+		query = 'select * from dhcp'
+		result = conn.execute(query)
+		result = [row for row in result]
+		result = sorted(result, key=itemgetter(5), reverse = True)
+	elif n == 2:
+		#Позволяет далее обращаться к данным в колонках, по имени колонки
+		conn.row_factory = sqlite3.Row
+		query = 'select * from dhcp where {} = ? order by active desc'.format(key)
+		result = conn.execute(query, (value, ))
+	
+	return result
+
+
+def output (result, n = len(sys.argv[1:])):
+	if result:
+		if n == 2:
+			print('Detailed information for host(s) with {} {}'.format(key, value))
+			for row in result:
+				if row['active'] == 0:
+					print('-'*40+'\nInactive values:\n'+'-'*40)
+				for k in keys:
+					print('{:12}: {}'.format(k, row[k]))
+				print('-' * 40)
+		elif n == 0:
+			print('Active values:\n'+'-'*40)
+			for row in result:
+				if row[5] == 0 and result[result.index(row)-1][5] == 1:
+					print('-'*40+'\nInactive values:\n'+'-'*40)
+				print('{:20}{:20}{:12}{:20}{:5}{:3}'.format(*row))
+	else:
+		print('неверное число аргументов')
+
+
+
+if len(sys.argv[1:]) == 2:
+	key, value = sys.argv[1:]
+	
+	
+	if key in keys:
+		keys.remove(key)
+		output(db_find())
+	else:
+		print('Данный параметр не поддерживается.\n'
+		'Допустимые значения параметров: {}, {}, {}, {}, {}'.format(*keys))
+else:
+	print('-' * 40)
+	output(db_find())
+
+conn.close()

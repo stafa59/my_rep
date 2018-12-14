@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python3
 '''
 Задание 18.1
 
@@ -31,3 +31,16 @@
 На данном этапе, оба скрипта вызываются без аргументов.
 
 '''
+import add_data
+import create_db
+import os
+import sqlite3
+
+db_filename = 'db.db'
+schema_filename = 'dhcp_snooping_schema.sql'
+
+conn = create_db.create(db_filename, schema_filename)
+add_data.insert_dhcp(conn)
+add_data.insert_switches(conn)
+
+conn.close()
